@@ -21,40 +21,26 @@ function fmt(n){return new Intl.NumberFormat('fr-FR',{maximumFractionDigits:2}).
 function esc(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
 function doctorById(id){return state.workers.find(w=>w.id===id)}
 function monthEntries(){return state.entries.filter(e=>e.date.startsWith(currentMonth)).sort((a,b)=>b.date.localeCompare(a.date)||String(b.id).localeCompare(String(a.id)))}
-function trashIcon(){return '<svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 10v6M14 10v6"/></svg>'}
 
 function render(){
   $('monthPicker').value=currentMonth;
-  renderDoctorOptions();
-  renderSummary();
-  renderEntries();
-  renderDoctorStats();
-  renderWorkersCount();
+  renderDoctorOptions();renderSummary();renderEntries();renderDoctorStats();renderWorkersCount();
 }
 function renderDoctorOptions(){
-  const current=$('entryDoctor').value;
-  const workers=activeWorkers();
+  const current=$('entryDoctor').value,workers=activeWorkers();
   $('entryDoctor').innerHTML='<option value="">Choisir un médecin</option>'+workers.map(w=>`<option value="${w.id}">${esc(w.name)}</option>`).join('');
   if(workers.some(w=>w.id===current))$('entryDoctor').value=current;
 }
 function renderSummary(){
-  const entries=monthEntries();
-  const t=entries.reduce((a,e)=>({consultations:a.consultations+number(e.consultations),generated:a.generated+number(e.generated),taken:a.taken+number(e.taken)}),{consultations:0,generated:0,taken:0});
-  $('summaryConsultations').textContent=fmt(t.consultations);
-  $('summaryGenerated').textContent=fmt(t.generated);
-  $('summaryTaken').textContent=fmt(t.taken);
-  $('summaryBalance').textContent=fmt(t.generated-t.taken);
+  const t=monthEntries().reduce((a,e)=>({consultations:a.consultations+number(e.consultations),generated:a.generated+number(e.generated),taken:a.taken+number(e.taken)}),{consultations:0,generated:0,taken:0});
+  $('summaryConsultations').textContent=fmt(t.consultations);$('summaryGenerated').textContent=fmt(t.generated);$('summaryTaken').textContent=fmt(t.taken);$('summaryBalance').textContent=fmt(t.generated-t.taken);
 }
 function renderEntries(){
-  const entries=monthEntries();
-  $('entriesCount').textContent=`${entries.length} ${entries.length===1?'saisie':'saisies'}`;
-  if(!entries.length){
-    $('entriesList').innerHTML='<div class="empty-state">Aucune saisie pour ce mois.<br>Appuyez sur « Nouvelle saisie » pour commencer.</div>';
-    return;
-  }
+  const entries=monthEntries();$('entriesCount').textContent=`${entries.length} ${entries.length===1?'saisie':'saisies'}`;
+  if(!entries.length){$('entriesList').innerHTML='<div class="empty-state">Aucune saisie pour ce mois.<br>Ajoutez la première avec « Nouvelle saisie ».</div>';return}
   $('entriesList').innerHTML=entries.map(e=>{
     const d=new Date(`${e.date}T12:00:00`),doctor=doctorById(e.doctorId),day=d.toLocaleDateString('fr-FR',{day:'2-digit'}),mon=d.toLocaleDateString('fr-FR',{month:'short'}).replace('.','');
-    return `<article class="entry-item"><div class="entry-date">${day}<small>${mon}</small></div><div class="entry-main"><strong>${esc(doctor?.name||'Médecin')}</strong><p>${fmt(e.consultations)} consultations${e.notes?` · ${esc(e.notes)}`:''}</p><div class="entry-actions"><button class="mini-btn" data-edit="${e.id}">Modifier</button><button class="mini-btn danger" data-delete="${e.id}">Supprimer</button></div></div><div class="entry-values"><strong>${fmt(e.generated)} MRU</strong><small>${number(e.taken)?`Retiré : ${fmt(e.taken)} MRU`:'Aucun retrait'}</small></div></article>`;
+    return `<article class="entry-item"><div class="entry-date">${day}<small>${mon}</small></div><div class="entry-main"><strong>${esc(doctor?.name||'Médecin')}</strong><p>${fmt(e.consultations)} consultations${e.notes?` · ${esc(e.notes)}`:''}</p><div class="entry-actions"><button class="mini-btn" data-edit="${e.id}"><i class="fa-solid fa-pen"></i>Modifier</button><button class="mini-btn danger" data-delete="${e.id}"><i class="fa-solid fa-trash"></i>Supprimer</button></div></div><div class="entry-values"><strong>${fmt(e.generated)} MRU</strong><small>${number(e.taken)?`Retiré : ${fmt(e.taken)} MRU`:'Aucun retrait'}</small></div></article>`;
   }).join('');
 }
 function renderDoctorStats(){
@@ -64,81 +50,27 @@ function renderDoctorStats(){
   $('doctorStats').innerHTML=totals.length?totals.map(x=>`<div class="doctor-stat"><div class="doctor-stat-head"><strong>${esc(x.w.name)}</strong><span>${fmt(x.consultations)}</span></div><small>${fmt(x.generated)} MRU générés</small><div class="bar"><i style="width:${x.consultations?Math.max(5,(x.consultations/max)*100):0}%"></i></div></div>`).join(''):'<div class="empty-state">Aucun médecin actif.</div>';
 }
 function renderWorkersCount(){$('workersCount').textContent=`${activeWorkers().length} actif${activeWorkers().length>1?'s':''}`}
-
-function openEntryDialog(){
-  if(!activeWorkers().length){showToast('Ajoutez d’abord un médecin');openWorkers();return}
-  resetForm();
-  $('entryDialog').showModal();
-}
+function openEntryDialog(){if(!activeWorkers().length){showToast('Ajoutez d’abord un médecin');openWorkers();return}resetForm();$('entryDialog').showModal()}
 function closeEntryDialog(){if($('entryDialog').open)$('entryDialog').close();resetForm()}
 function submitEntry(e){
-  e.preventDefault();
-  const doctorId=$('entryDoctor').value,date=$('entryDate').value,consultations=number($('entryConsultations').value);
-  if(!doctorId||!date)return;
+  e.preventDefault();const doctorId=$('entryDoctor').value,date=$('entryDate').value,consultations=number($('entryConsultations').value);if(!doctorId||!date)return;
   const data={date,doctorId,consultations,generated:number($('entryGenerated').value),taken:number($('entryTaken').value),notes:$('entryNotes').value.trim()};
-  if(editingId){const i=state.entries.findIndex(x=>String(x.id)===String(editingId));if(i>=0)state.entries[i]={...state.entries[i],...data};showToast('Saisie modifiée')}
-  else{state.entries.push({id:Date.now().toString(),...data});showToast('Saisie enregistrée')}
-  currentMonth=date.slice(0,7);
-  saveState();
-  render();
-  closeEntryDialog();
+  if(editingId){const i=state.entries.findIndex(x=>String(x.id)===String(editingId));if(i>=0)state.entries[i]={...state.entries[i],...data};showToast('Saisie modifiée')}else{state.entries.push({id:Date.now().toString(),...data});showToast('Saisie enregistrée')}
+  currentMonth=date.slice(0,7);saveState();render();closeEntryDialog();
 }
-function editEntry(id){
-  const x=state.entries.find(e=>String(e.id)===String(id));if(!x)return;
-  editingId=x.id;
-  renderDoctorOptions();
-  $('entryDate').value=x.date;
-  $('entryDoctor').value=x.doctorId;
-  $('entryConsultations').value=x.consultations;
-  $('entryGenerated').value=x.generated||'';
-  $('entryTaken').value=x.taken||'';
-  $('entryNotes').value=x.notes||'';
-  $('entryDialogTitle').textContent='Modifier la saisie';
-  document.querySelector('.save-entry span').textContent='Enregistrer';
-  $('entryDialog').showModal();
-}
+function editEntry(id){const x=state.entries.find(e=>String(e.id)===String(id));if(!x)return;editingId=x.id;renderDoctorOptions();$('entryDate').value=x.date;$('entryDoctor').value=x.doctorId;$('entryConsultations').value=x.consultations;$('entryGenerated').value=x.generated||'';$('entryTaken').value=x.taken||'';$('entryNotes').value=x.notes||'';$('entryDialogTitle').textContent='Modifier la saisie';$('entryDialog').showModal()}
 function deleteEntry(id){const x=state.entries.find(e=>String(e.id)===String(id));if(!x||!confirm('Supprimer cette saisie ?'))return;state.entries=state.entries.filter(e=>String(e.id)!==String(id));saveState();render();showToast('Saisie supprimée')}
-function resetForm(){editingId=null;$('entryForm').reset();$('entryDate').value=new Date().toISOString().slice(0,10);$('entryDialogTitle').textContent='Nouvelle saisie';document.querySelector('.save-entry span').textContent='Enregistrer';renderDoctorOptions()}
+function resetForm(){editingId=null;$('entryForm').reset();$('entryDate').value=new Date().toISOString().slice(0,10);$('entryDialogTitle').textContent='Nouvelle saisie';renderDoctorOptions()}
 function changeMonth(delta){const[y,m]=currentMonth.split('-').map(Number);currentMonth=monthKey(new Date(y,m-1+delta,1));render()}
-
 function openWorkers(){renderWorkers();$('workersDialog').showModal()}
 function closeWorkers(){if($('workersDialog').open)$('workersDialog').close()}
-function renderWorkers(){
-  const workers=activeWorkers();
-  $('workersList').innerHTML=workers.map(w=>`<div class="worker-item"><input class="worker-name" data-worker-name="${w.id}" value="${esc(w.name)}" aria-label="Nom du médecin"><button type="button" class="danger-btn" data-remove-worker="${w.id}" aria-label="Supprimer ${esc(w.name)}">${trashIcon()}</button></div>`).join('')||'<div class="empty-state">Aucun médecin actif.</div>';
-  renderWorkersCount();
-}
-function addWorker(){
-  const input=$('newWorkerName'),name=input.value.trim();if(!name)return;
-  if(activeWorkers().some(w=>w.name.toLowerCase()===name.toLowerCase())){showToast('Ce médecin existe déjà');return}
-  state.workers.push({id:`w${Date.now()}`,name,active:true});
-  input.value='';saveState();renderWorkers();render();showToast('Médecin ajouté')
-}
+function renderWorkers(){const workers=activeWorkers();$('workersList').innerHTML=workers.map(w=>`<div class="worker-item"><input class="worker-name" data-worker-name="${w.id}" value="${esc(w.name)}" aria-label="Nom du médecin"><button type="button" class="danger-btn" data-remove-worker="${w.id}" aria-label="Supprimer ${esc(w.name)}"><i class="fa-solid fa-trash"></i></button></div>`).join('')||'<div class="empty-state">Aucun médecin actif.</div>';renderWorkersCount()}
+function addWorker(){const input=$('newWorkerName'),name=input.value.trim();if(!name)return;if(activeWorkers().some(w=>w.name.toLowerCase()===name.toLowerCase())){showToast('Ce médecin existe déjà');return}state.workers.push({id:`w${Date.now()}`,name,active:true});input.value='';saveState();renderWorkers();render();showToast('Médecin ajouté')}
 function removeWorker(id){const w=doctorById(id);if(!w||!confirm(`Retirer ${w.name} de la liste ?`))return;w.active=false;saveState();renderWorkers();render();showToast('Médecin retiré')}
 function renameWorker(id,name){const w=doctorById(id);if(w&&name.trim()){w.name=name.trim();saveState();render();showToast('Nom mis à jour')}}
 function exportData(){const blob=new Blob([JSON.stringify({...state,version:2,exportedAt:new Date().toISOString()},null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`cabinet-sene-${currentMonth}.json`;a.click();URL.revokeObjectURL(url);showToast('Sauvegarde exportée')}
 async function importData(file){if(!file)return;try{const data=JSON.parse(await file.text());if(!Array.isArray(data.workers)||!Array.isArray(data.entries))throw new Error();state={workers:data.workers,entries:data.entries};saveState();render();showToast('Sauvegarde importée')}catch(e){alert('Impossible d’importer cette sauvegarde.')}$('importInput').value=''}
 function showToast(text){const el=$('toast');el.textContent=text;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),1800)}
 
-$('openEntryBtn').addEventListener('click',openEntryDialog);
-$('fabEntryBtn').addEventListener('click',openEntryDialog);
-$('entryForm').addEventListener('submit',submitEntry);
-$('closeEntryBtn').addEventListener('click',closeEntryDialog);
-$('cancelEntryBtn').addEventListener('click',closeEntryDialog);
-$('entryDialog').addEventListener('click',e=>{if(e.target===$('entryDialog'))closeEntryDialog()});
-$('entriesList').addEventListener('click',e=>{if(e.target.dataset.edit)editEntry(e.target.dataset.edit);if(e.target.dataset.delete)deleteEntry(e.target.dataset.delete)});
-$('prevMonthBtn').addEventListener('click',()=>changeMonth(-1));
-$('nextMonthBtn').addEventListener('click',()=>changeMonth(1));
-$('monthPicker').addEventListener('change',e=>{if(e.target.value){currentMonth=e.target.value;render()}});
-$('manageWorkersBtn').addEventListener('click',openWorkers);
-$('addDoctorQuickBtn').addEventListener('click',openWorkers);
-$('closeWorkersBtn').addEventListener('click',closeWorkers);
-$('workersDialog').addEventListener('click',e=>{if(e.target===$('workersDialog'))closeWorkers()});
-$('addWorkerBtn').addEventListener('click',addWorker);
-$('newWorkerName').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addWorker()}});
-$('workersList').addEventListener('click',e=>{const btn=e.target.closest('[data-remove-worker]');if(btn)removeWorker(btn.dataset.removeWorker)});
-$('workersList').addEventListener('change',e=>{if(e.target.dataset.workerName)renameWorker(e.target.dataset.workerName,e.target.value)});
-$('exportBtn').addEventListener('click',exportData);
-$('importInput').addEventListener('change',e=>importData(e.target.files[0]));
-
+$('openEntryBtn').addEventListener('click',openEntryDialog);$('fabEntryBtn').addEventListener('click',openEntryDialog);$('entryForm').addEventListener('submit',submitEntry);$('closeEntryBtn').addEventListener('click',closeEntryDialog);$('cancelEntryBtn').addEventListener('click',closeEntryDialog);$('entryDialog').addEventListener('click',e=>{if(e.target===$('entryDialog'))closeEntryDialog()});$('entriesList').addEventListener('click',e=>{const edit=e.target.closest('[data-edit]'),del=e.target.closest('[data-delete]');if(edit)editEntry(edit.dataset.edit);if(del)deleteEntry(del.dataset.delete)});$('prevMonthBtn').addEventListener('click',()=>changeMonth(-1));$('nextMonthBtn').addEventListener('click',()=>changeMonth(1));$('monthPicker').addEventListener('change',e=>{if(e.target.value){currentMonth=e.target.value;render()}});$('manageWorkersBtn').addEventListener('click',openWorkers);$('addDoctorQuickBtn').addEventListener('click',openWorkers);$('closeWorkersBtn').addEventListener('click',closeWorkers);$('workersDialog').addEventListener('click',e=>{if(e.target===$('workersDialog'))closeWorkers()});$('addWorkerBtn').addEventListener('click',addWorker);$('newWorkerName').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addWorker()}});$('workersList').addEventListener('click',e=>{const btn=e.target.closest('[data-remove-worker]');if(btn)removeWorker(btn.dataset.removeWorker)});$('workersList').addEventListener('change',e=>{if(e.target.dataset.workerName)renameWorker(e.target.dataset.workerName,e.target.value)});$('exportBtn').addEventListener('click',exportData);$('importInput').addEventListener('change',e=>importData(e.target.files[0]));
 resetForm();render();saveState();
