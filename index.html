@@ -51,7 +51,7 @@
 
     <footer class="app-footer">
       <span id="saveStatus">Enregistré localement</span>
-      <div><button id="exportBtn" class="footer-link">Exporter</button><label class="footer-link">Importer<input id="importInput" type="file" accept="application/json" hidden /></label></div>
+      <div><button id="exportBtn" class="footer-link"><i class="fa-solid fa-file-excel"></i> Exporter Excel</button><label class="footer-link">Importer<input id="importInput" type="file" accept="application/json" hidden /></label></div>
     </footer>
   </div>
 
@@ -82,6 +82,7 @@
   </dialog>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="./app.js"></script>
 </body>
 </html>
