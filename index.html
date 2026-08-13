@@ -2,76 +2,88 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#0f766e" />
-  <title>Cabinet Séné · Suivi d'activité</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1220" />
+  <title>Cabinet Séné · Tableau de bord</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
   <div class="app-shell">
-    <header class="topbar">
-      <div>
-        <p class="eyebrow">Cabinet Séné</p>
-        <h1>Suivi d'activité</h1>
-        <p class="subtitle">Enregistrez les consultations et les mouvements de caisse en quelques secondes.</p>
+    <header class="app-header">
+      <div class="brand-block">
+        <div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 3h6v5h5v6h-5v5H9v-5H4V8h5V3Z"/></svg></div>
+        <div><span class="brand-kicker">CABINET SÉNÉ</span><h1>Tableau de bord</h1></div>
       </div>
-      <button id="manageWorkersBtn" class="btn btn-secondary" type="button">Gérer les médecins</button>
+      <button id="manageWorkersBtn" class="icon-action" type="button" aria-label="Gérer les médecins" title="Gérer les médecins">
+        <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM19 8v6M22 11h-6"/></svg>
+      </button>
     </header>
 
     <main>
-      <section class="entry-card">
-        <div class="section-title">
-          <div><span class="step-badge">+</span><div><h2>Nouvelle saisie</h2><p>Choisissez le médecin puis renseignez les données de la journée.</p></div></div>
-        </div>
-        <form id="entryForm" class="entry-form">
-          <label><span>Date</span><input id="entryDate" type="date" required /></label>
-          <label class="doctor-field"><span>Médecin</span><select id="entryDoctor" required></select></label>
-          <label><span>Consultations</span><input id="entryConsultations" type="number" min="0" inputmode="numeric" placeholder="0" required /></label>
-          <label><span>Total généré</span><div class="money-wrap"><input id="entryGenerated" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0" /><small>MRU</small></div></label>
-          <label><span>Retiré / pris</span><div class="money-wrap"><input id="entryTaken" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0" /><small>MRU</small></div></label>
-          <label class="note-field"><span>Remarque</span><input id="entryNotes" type="text" placeholder="Ex. paiement, dépense, précision…" /></label>
-          <button class="btn btn-primary save-entry" type="submit">Enregistrer</button>
-        </form>
+      <section class="hero-card">
+        <div class="hero-copy"><span class="hero-label">Gestion quotidienne</span><h2>Suivez l’activité du cabinet simplement.</h2><p>Consultations, recettes, retraits et remarques dans une interface pensée pour le mobile.</p></div>
+        <button id="openEntryBtn" class="primary-cta" type="button">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>Nouvelle saisie</span>
+        </button>
       </section>
 
-      <section class="period-bar">
-        <button id="prevMonthBtn" class="icon-btn" type="button" aria-label="Mois précédent">←</button>
-        <div><span>Vue mensuelle</span><input id="monthPicker" type="month" /></div>
-        <button id="nextMonthBtn" class="icon-btn" type="button" aria-label="Mois suivant">→</button>
+      <section class="period-section">
+        <button id="prevMonthBtn" class="month-btn" type="button" aria-label="Mois précédent"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>
+        <label class="month-picker"><span>Période</span><input id="monthPicker" type="month" /></label>
+        <button id="nextMonthBtn" class="month-btn" type="button" aria-label="Mois suivant"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>
       </section>
 
-      <section class="summary-grid">
-        <article class="summary-card"><span>Consultations</span><strong id="summaryConsultations">0</strong><small>ce mois</small></article>
-        <article class="summary-card"><span>Total généré</span><strong id="summaryGenerated">0</strong><small>MRU</small></article>
-        <article class="summary-card"><span>Total retiré</span><strong id="summaryTaken">0</strong><small>MRU</small></article>
-        <article class="summary-card accent"><span>Solde</span><strong id="summaryBalance">0</strong><small>MRU</small></article>
+      <section class="summary-grid" aria-label="Résumé mensuel">
+        <article class="metric-card"><div class="metric-icon blue"><svg viewBox="0 0 24 24"><path d="M8 7h8M8 11h8M8 15h5M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/></svg></div><div><span>Consultations</span><strong id="summaryConsultations">0</strong></div></article>
+        <article class="metric-card"><div class="metric-icon green"><svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div><span>Total généré</span><strong><span id="summaryGenerated">0</span> <small>MRU</small></strong></div></article>
+        <article class="metric-card"><div class="metric-icon orange"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg></div><div><span>Total retiré</span><strong><span id="summaryTaken">0</span> <small>MRU</small></strong></div></article>
+        <article class="metric-card metric-accent"><div class="metric-icon violet"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-9M14 6h7v7"/></svg></div><div><span>Solde</span><strong><span id="summaryBalance">0</span> <small>MRU</small></strong></div></article>
       </section>
 
-      <section class="content-grid">
-        <div class="panel">
-          <div class="panel-head"><div><h2>Activité récente</h2><p id="entriesCount">0 saisie</p></div></div>
+      <section class="dashboard-grid">
+        <article class="surface activity-surface">
+          <div class="surface-head"><div><span class="section-kicker">HISTORIQUE</span><h2>Activité récente</h2></div><span id="entriesCount" class="count-pill">0 saisie</span></div>
           <div id="entriesList" class="entries-list"></div>
-        </div>
-        <aside class="panel doctors-panel">
-          <div class="panel-head"><div><h2>Par médecin</h2><p>Résumé du mois</p></div></div>
+        </article>
+
+        <aside class="surface doctors-surface">
+          <div class="surface-head"><div><span class="section-kicker">ÉQUIPE</span><h2>Par médecin</h2></div><button id="addDoctorQuickBtn" class="small-icon-btn" type="button" aria-label="Ajouter un médecin"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div>
           <div id="doctorStats" class="doctor-stats"></div>
         </aside>
       </section>
     </main>
 
-    <footer>
-      <span id="saveStatus">Enregistré localement</span>
-      <div><button id="exportBtn" class="text-btn">Exporter</button><label class="text-btn">Importer<input id="importInput" type="file" accept="application/json" hidden /></label></div>
-    </footer>
+    <footer class="app-footer"><span id="saveStatus">Enregistré localement</span><div><button id="exportBtn" class="footer-btn"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Exporter</button><label class="footer-btn"><svg viewBox="0 0 24 24"><path d="M12 21V9M7 14l5-5 5 5M5 3h14"/></svg>Importer<input id="importInput" type="file" accept="application/json" hidden /></label></div></footer>
   </div>
 
-  <dialog id="workersDialog">
-    <form method="dialog" class="dialog-card">
-      <div class="dialog-head"><div><p class="eyebrow">Équipe</p><h2>Gérer les médecins</h2></div><button class="icon-btn" value="cancel" aria-label="Fermer">×</button></div>
-      <div id="workersList" class="workers-list"></div>
-      <div class="add-worker-row"><input id="newWorkerName" type="text" placeholder="Nom du médecin" autocomplete="off" /><button id="addWorkerBtn" class="btn btn-primary" type="button">Ajouter</button></div>
+  <button id="fabEntryBtn" class="fab" type="button" aria-label="Nouvelle saisie"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+
+  <dialog id="entryDialog" class="sheet-dialog">
+    <form id="entryForm" class="sheet-card">
+      <div class="sheet-handle"></div>
+      <div class="dialog-head"><div><span class="section-kicker">ACTIVITÉ</span><h2 id="entryDialogTitle">Nouvelle saisie</h2></div><button id="closeEntryBtn" class="close-btn" type="button" aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
+      <div class="form-grid">
+        <label class="field"><span><svg viewBox="0 0 24 24"><path d="M6 2v4M18 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14H3V6a2 2 0 0 1 2-2Z"/></svg>Date</span><input id="entryDate" type="date" required /></label>
+        <label class="field"><span><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/></svg>Médecin</span><select id="entryDoctor" required></select></label>
+        <label class="field"><span><svg viewBox="0 0 24 24"><path d="M8 7h8M8 11h8M8 15h5M5 3h14a2 2 0 0 1 2 2v14H3V5a2 2 0 0 1 2-2Z"/></svg>Consultations</span><input id="entryConsultations" type="number" min="0" inputmode="numeric" placeholder="0" required /></label>
+        <label class="field"><span><svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Total généré</span><div class="money-input"><input id="entryGenerated" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0" /><b>MRU</b></div></label>
+        <label class="field"><span><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Retiré / pris</span><div class="money-input"><input id="entryTaken" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0" /><b>MRU</b></div></label>
+        <label class="field field-full"><span><svg viewBox="0 0 24 24"><path d="M4 4h16v12H7l-3 3V4Z"/></svg>Remarque</span><textarea id="entryNotes" rows="3" placeholder="Paiement, dépense, précision…"></textarea></label>
+      </div>
+      <div class="dialog-actions"><button id="cancelEntryBtn" class="secondary-btn" type="button">Annuler</button><button class="save-entry primary-btn" type="submit"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg><span>Enregistrer</span></button></div>
     </form>
   </dialog>
+
+  <dialog id="workersDialog" class="sheet-dialog">
+    <form class="sheet-card" onsubmit="return false">
+      <div class="sheet-handle"></div>
+      <div class="dialog-head"><div><span class="section-kicker">ÉQUIPE</span><h2>Gérer les médecins</h2></div><button id="closeWorkersBtn" class="close-btn" type="button" aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
+      <div class="add-doctor-box"><div class="add-doctor-icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM19 8v6M22 11h-6"/></svg></div><div class="add-worker-row"><input id="newWorkerName" type="text" placeholder="Nom du nouveau médecin" autocomplete="off" /><button id="addWorkerBtn" class="primary-btn" type="button"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>Ajouter</span></button></div></div>
+      <div class="workers-title"><span>Médecins actifs</span><small id="workersCount"></small></div>
+      <div id="workersList" class="workers-list"></div>
+    </form>
+  </dialog>
+
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="./app.js"></script>
 </body>
