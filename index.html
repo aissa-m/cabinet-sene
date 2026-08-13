@@ -1,100 +1,50 @@
 <!doctype html>
-<html lang="es">
+<html lang="fr">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#0f766e" />
-  <title>Cabinet Séné · Registro diario</title>
+  <title>Cabinet Séné · Registre journalier</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
   <div class="app-shell">
     <header class="topbar">
-      <div>
-        <p class="eyebrow">Cabinet Séné</p>
-        <h1>Registro diario</h1>
-        <p class="subtitle">Consultas, caja y anotaciones en un solo sitio.</p>
-      </div>
+      <div><p class="eyebrow">Cabinet Séné</p><h1>Registre journalier</h1><p class="subtitle">Consultations, caisse et notes au même endroit.</p></div>
       <div class="top-actions">
-        <button id="manageWorkersBtn" class="btn btn-secondary" type="button">Gestionar médicos</button>
-        <button id="exportBtn" class="btn btn-secondary" type="button">Exportar copia</button>
-        <label class="btn btn-secondary file-btn">Importar copia<input id="importInput" type="file" accept="application/json" hidden /></label>
+        <button id="manageWorkersBtn" class="btn btn-secondary" type="button">Gérer les médecins</button>
+        <button id="exportBtn" class="btn btn-secondary" type="button">Exporter une sauvegarde</button>
+        <label class="btn btn-secondary file-btn">Importer une sauvegarde<input id="importInput" type="file" accept="application/json" hidden /></label>
       </div>
     </header>
-
     <main>
       <section class="period-card">
-        <button id="prevMonthBtn" class="icon-btn" type="button" aria-label="Mes anterior">←</button>
-        <div class="period-center">
-          <label for="monthPicker">Mes de trabajo</label>
-          <input id="monthPicker" type="month" />
-        </div>
-        <button id="nextMonthBtn" class="icon-btn" type="button" aria-label="Mes siguiente">→</button>
+        <button id="prevMonthBtn" class="icon-btn" type="button" aria-label="Mois précédent">←</button>
+        <div class="period-center"><label for="monthPicker">Mois de travail</label><input id="monthPicker" type="month" /></div>
+        <button id="nextMonthBtn" class="icon-btn" type="button" aria-label="Mois suivant">→</button>
       </section>
-
-      <section class="summary-grid" aria-label="Resumen mensual">
-        <article class="summary-card">
-          <span>Consultas</span>
-          <strong id="summaryConsultations">0</strong>
-        </article>
-        <article class="summary-card">
-          <span>Total generado</span>
-          <strong id="summaryGenerated">0</strong>
-        </article>
-        <article class="summary-card">
-          <span>Retirado / cogido</span>
-          <strong id="summaryTaken">0</strong>
-        </article>
-        <article class="summary-card accent">
-          <span>Saldo</span>
-          <strong id="summaryBalance">0</strong>
-        </article>
+      <section class="summary-grid" aria-label="Résumé mensuel">
+        <article class="summary-card"><span>Consultations</span><strong id="summaryConsultations">0</strong></article>
+        <article class="summary-card"><span>Total généré</span><strong id="summaryGenerated">0</strong></article>
+        <article class="summary-card"><span>Retiré / pris</span><strong id="summaryTaken">0</strong></article>
+        <article class="summary-card accent"><span>Solde</span><strong id="summaryBalance">0</strong></article>
       </section>
-
       <section class="table-card">
-        <div class="table-heading">
-          <div>
-            <h2>Actividad del mes</h2>
-            <p>Los cambios se guardan automáticamente en este navegador.</p>
-          </div>
-          <button id="todayBtn" class="btn btn-ghost" type="button">Ir a este mes</button>
-        </div>
-        <div class="table-wrap">
-          <table id="activityTable">
-            <thead id="tableHead"></thead>
-            <tbody id="tableBody"></tbody>
-            <tfoot id="tableFoot"></tfoot>
-          </table>
-        </div>
+        <div class="table-heading"><div><h2>Activité du mois</h2><p>Les modifications sont enregistrées automatiquement dans ce navigateur.</p></div><button id="todayBtn" class="btn btn-ghost" type="button">Aller au mois actuel</button></div>
+        <div class="table-wrap"><table id="activityTable"><thead id="tableHead"></thead><tbody id="tableBody"></tbody><tfoot id="tableFoot"></tfoot></table></div>
       </section>
     </main>
-
-    <footer>
-      <span id="saveStatus">Guardado localmente</span>
-      <span>Cabinet Séné</span>
-    </footer>
+    <footer><span id="saveStatus">Enregistré localement</span><span>Cabinet Séné</span></footer>
   </div>
-
   <dialog id="workersDialog">
     <form method="dialog" class="dialog-card" id="workersForm">
-      <div class="dialog-head">
-        <div>
-          <p class="eyebrow">Equipo</p>
-          <h2>Gestionar médicos</h2>
-        </div>
-        <button class="icon-btn" value="cancel" aria-label="Cerrar">×</button>
-      </div>
+      <div class="dialog-head"><div><p class="eyebrow">Équipe</p><h2>Gérer les médecins</h2></div><button class="icon-btn" value="cancel" aria-label="Fermer">×</button></div>
       <div id="workersList" class="workers-list"></div>
-      <div class="add-worker-row">
-        <input id="newWorkerName" type="text" placeholder="Nombre del médico" autocomplete="off" />
-        <button id="addWorkerBtn" class="btn btn-primary" type="button">Añadir</button>
-      </div>
-      <p class="dialog-note">Al eliminar un médico se conservan sus datos históricos en la copia local, pero deja de mostrarse en la tabla.</p>
+      <div class="add-worker-row"><input id="newWorkerName" type="text" placeholder="Nom du médecin" autocomplete="off" /><button id="addWorkerBtn" class="btn btn-primary" type="button">Ajouter</button></div>
+      <p class="dialog-note">Lorsqu’un médecin est supprimé, ses données historiques restent conservées dans la sauvegarde locale, mais il n’apparaît plus dans le tableau.</p>
     </form>
   </dialog>
-
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-
   <script src="./app.js"></script>
 </body>
 </html>
