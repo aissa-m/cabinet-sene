@@ -68,7 +68,55 @@ function renderWorkers(){const workers=activeWorkers();$('workersList').innerHTM
 function addWorker(){const input=$('newWorkerName'),name=input.value.trim();if(!name)return;if(activeWorkers().some(w=>w.name.toLowerCase()===name.toLowerCase())){showToast('Ce médecin existe déjà');return}state.workers.push({id:`w${Date.now()}`,name,active:true});input.value='';saveState();renderWorkers();render();showToast('Médecin ajouté')}
 function removeWorker(id){const w=doctorById(id);if(!w||!confirm(`Retirer ${w.name} de la liste ?`))return;w.active=false;saveState();renderWorkers();render();showToast('Médecin retiré')}
 function renameWorker(id,name){const w=doctorById(id);if(w&&name.trim()){w.name=name.trim();saveState();render();showToast('Nom mis à jour')}}
-function exportData(){const blob=new Blob([JSON.stringify({...state,version:2,exportedAt:new Date().toISOString()},null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`cabinet-sene-${currentMonth}.json`;a.click();URL.revokeObjectURL(url);showToast('Sauvegarde exportée')}
+
+function excelDate(dateStr){
+  const [y,m,d]=dateStr.split('-').map(Number);
+  return new Date(y,m-1,d);
+}
+function exportData(){
+  if(typeof XLSX==='undefined'){alert('Le module Excel n’a pas pu être chargé. Réessayez avec une connexion internet.');return}
+  if(!state.entries.length){showToast('Aucune donnée à exporter');return}
+
+  const sorted=[...state.entries].sort((a,b)=>a.date.localeCompare(b.date)||String(a.id).localeCompare(String(b.id)));
+  const rows=sorted.map(e=>({
+    Date:excelDate(e.date),
+    Travailleur:doctorById(e.doctorId)?.name||'Médecin',
+    Consultations:number(e.consultations),
+    'Total généré (MRU)':number(e.generated),
+    'Montant retiré (MRU)':number(e.taken),
+    'Solde (MRU)':number(e.generated)-number(e.taken),
+    Remarque:e.notes||''
+  }));
+
+  const totalConsultations=rows.reduce((s,r)=>s+r.Consultations,0);
+  const totalGenere=rows.reduce((s,r)=>s+r['Total généré (MRU)'],0);
+  const totalRetire=rows.reduce((s,r)=>s+r['Montant retiré (MRU)'],0);
+  const totalSolde=rows.reduce((s,r)=>s+r['Solde (MRU)'],0);
+  rows.push({
+    Date:'',
+    Travailleur:'TOTAL',
+    Consultations:totalConsultations,
+    'Total généré (MRU)':totalGenere,
+    'Montant retiré (MRU)':totalRetire,
+    'Solde (MRU)':totalSolde,
+    Remarque:''
+  });
+
+  const ws=XLSX.utils.json_to_sheet(rows,{header:['Date','Travailleur','Consultations','Total généré (MRU)','Montant retiré (MRU)','Solde (MRU)','Remarque']});
+  ws['!cols']=[{wch:13},{wch:24},{wch:15},{wch:20},{wch:22},{wch:16},{wch:42}];
+  ws['!autofilter']={ref:`A1:G${rows.length}`};
+  for(let r=2;r<=rows.length;r++){
+    const dateCell=ws[`A${r}`];
+    if(dateCell&&dateCell.v instanceof Date){dateCell.t='d';dateCell.z='dd/mm/yyyy'}
+    ['D','E','F'].forEach(col=>{const c=ws[`${col}${r}`];if(c&&typeof c.v==='number')c.z='#,##0.00'});
+  }
+
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Registre');
+  const filename=`cabinet-sene-export-${new Date().toISOString().slice(0,10)}.xlsx`;
+  XLSX.writeFile(wb,filename,{compression:true});
+  showToast('Excel exporté');
+}
 async function importData(file){if(!file)return;try{const data=JSON.parse(await file.text());if(!Array.isArray(data.workers)||!Array.isArray(data.entries))throw new Error();state={workers:data.workers,entries:data.entries};saveState();render();showToast('Sauvegarde importée')}catch(e){alert('Impossible d’importer cette sauvegarde.')}$('importInput').value=''}
 function showToast(text){const el=$('toast');el.textContent=text;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),1800)}
 
