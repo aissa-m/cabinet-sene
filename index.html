@@ -63,8 +63,8 @@
       <div class="form-grid">
         <label class="field"><span>Date</span><input id="entryDate" type="date" required /></label>
         <label class="field"><span>Médecin de garde</span><select id="entryDoctor" required></select></label>
-        <label class="field"><span>Consultations</span><input id="entryConsultations" type="number" min="0" inputmode="numeric" placeholder="0" required /></label>
-        <label class="field"><span>Total généré</span><div class="money-input"><input id="entryGenerated" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0" /><b>MRU</b></div></label>
+        <label class="field"><span>Consultations</span><input id="entryConsultations" type="number" min="0" step="1" inputmode="numeric" placeholder="0" required /></label>
+        <label class="field"><span>Total généré (50 MRU / consultation)</span><div class="money-input"><input id="entryGenerated" type="number" readonly tabindex="-1" /><b>MRU</b></div></label>
         <label class="field field-full"><span>Remarque</span><textarea id="entryNotes" rows="3" placeholder="Paiement, dépense, précision…"></textarea></label>
       </div>
       <div class="modal-actions"><button id="cancelEntryBtn" class="secondary-btn" type="button">Annuler</button><button class="save-entry primary-btn" type="submit"><i class="fa-solid fa-check"></i><span>Enregistrer</span></button></div>
@@ -75,12 +75,12 @@
     <form id="withdrawalForm" class="modal-card">
       <div class="modal-head"><div><p class="modal-kicker">Retrait</p><h2 id="withdrawalDialogTitle">Nouveau retrait</h2></div><button id="closeWithdrawalBtn" class="close-button" type="button" aria-label="Fermer"><i class="fa-solid fa-xmark"></i></button></div>
       <div class="form-grid">
-        <label class="field"><span>Date</span><input id="withdrawalDate" type="date" required /></label>
+        <label class="field"><span>Date du retrait</span><input id="withdrawalDate" type="date" required /></label>
         <label class="field"><span>Médecin concerné</span><select id="withdrawalDoctor" required></select></label>
-        <label class="field"><span>Montant retiré</span><div class="money-input"><input id="withdrawalAmount" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0" required /><b>MRU</b></div></label>
+        <label class="field field-full"><span>Montant retiré</span><div class="money-input"><input id="withdrawalAmount" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="0" required /><b>MRU</b></div></label>
         <label class="field field-full"><span>Remarque</span><textarea id="withdrawalNotes" rows="3" placeholder="Motif ou précision…"></textarea></label>
       </div>
-      <div class="modal-actions"><button id="cancelWithdrawalBtn" class="secondary-btn" type="button">Annuler</button><button class="primary-btn" type="submit"><i class="fa-solid fa-check"></i><span>Enregistrer</span></button></div>
+      <div class="modal-actions"><button id="cancelWithdrawalBtn" class="secondary-btn" type="button">Annuler</button><button class="primary-btn" type="submit"><i class="fa-solid fa-check"></i><span>Enregistrer le retrait</span></button></div>
     </form>
   </dialog>
 
