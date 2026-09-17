@@ -52,15 +52,21 @@
         <div id="withdrawalsList" class="entries-list"></div>
       </section>
 
-      <section class="panel section-gap">
-        <div class="panel-head panel-head-row"><div><h2>Caisse du centre</h2><p>Entrées et sorties indépendantes des médecins</p></div><button id="openCashBtn2" class="text-action" type="button"><i class="fa-solid fa-plus"></i> Ajouter</button></div>
+      <section class="panel section-gap cash-panel">
+        <div class="cash-panel-header">
+          <div class="cash-title-wrap">
+            <div class="cash-icon"><i class="fa-solid fa-cash-register"></i></div>
+            <div><h2>Caisse du centre</h2><p>Entrées et sorties indépendantes des médecins</p></div>
+          </div>
+          <button id="openCashBtn2" class="primary-btn cash-add-btn" type="button"><i class="fa-solid fa-plus"></i><span>Ajouter un mouvement</span></button>
+        </div>
         <div class="cash-summary-grid">
-          <article class="cash-metric"><span>Entrées</span><strong><span id="cashIncome">0</span> <small>MRU</small></strong></article>
-          <article class="cash-metric"><span>Sorties</span><strong><span id="cashExpense">0</span> <small>MRU</small></strong></article>
+          <article class="cash-metric cash-income-card"><span>Entrées</span><strong><span id="cashIncome">0</span> <small>MRU</small></strong></article>
+          <article class="cash-metric cash-expense-card"><span>Sorties</span><strong><span id="cashExpense">0</span> <small>MRU</small></strong></article>
           <article class="cash-metric cash-balance"><span>Solde de caisse</span><strong><span id="cashBalance">0</span> <small>MRU</small></strong></article>
         </div>
-        <div class="panel-head cash-history-head"><div><h2>Mouvements</h2><p id="cashCount">0 mouvement</p></div></div>
-        <div id="cashList" class="entries-list"></div>
+        <div class="cash-list-header"><div><h3>Mouvements</h3><p id="cashCount">0 mouvement</p></div></div>
+        <div id="cashList" class="entries-list cash-list"></div>
       </section>
     </main>
 
