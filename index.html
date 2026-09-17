@@ -11,7 +11,7 @@
 <body>
   <div class="app-shell">
     <header class="app-header">
-      <div><p class="brand-kicker">Cabinet Séné</p><h1>Suivi d’activité</h1><p class="subtitle">Consultations et caisse du cabinet</p></div>
+      <div><p class="brand-kicker">Cabinet Séné</p><h1>Suivi d’activité</h1><p class="subtitle">Consultations, retraits et caisse du centre</p></div>
       <button id="manageWorkersBtn" class="icon-button" type="button" aria-label="Gérer les médecins" title="Gérer les médecins"><i class="fa-solid fa-user-doctor"></i></button>
     </header>
 
@@ -22,7 +22,8 @@
           <label><span>Mois</span><input id="monthPicker" type="month" /></label>
           <button id="nextMonthBtn" class="plain-icon" type="button" aria-label="Mois suivant"><i class="fa-solid fa-chevron-right"></i></button>
         </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <div class="toolbar-actions">
+          <button id="openCashBtn" class="secondary-btn" type="button"><i class="fa-solid fa-cash-register"></i><span>Mouvement de caisse</span></button>
           <button id="openWithdrawalBtn" class="secondary-btn" type="button"><i class="fa-solid fa-money-bill-transfer"></i><span>Nouveau retrait</span></button>
           <button id="openEntryBtn" class="primary-btn" type="button"><i class="fa-solid fa-plus"></i><span>Nouvelle saisie</span></button>
         </div>
@@ -32,7 +33,7 @@
         <article class="metric-card"><span>Consultations</span><strong id="summaryConsultations">0</strong></article>
         <article class="metric-card"><span>Total généré</span><strong><span id="summaryGenerated">0</span> <small>MRU</small></strong></article>
         <article class="metric-card"><span>Total retiré</span><strong><span id="summaryTaken">0</span> <small>MRU</small></strong></article>
-        <article class="metric-card balance-card"><span>Solde</span><strong><span id="summaryBalance">0</span> <small>MRU</small></strong></article>
+        <article class="metric-card balance-card"><span>Solde médecins</span><strong><span id="summaryBalance">0</span> <small>MRU</small></strong></article>
       </section>
 
       <section class="dashboard-grid">
@@ -46,13 +47,24 @@
         </aside>
       </section>
 
-      <section class="panel" style="margin-top:16px">
+      <section class="panel section-gap">
         <div class="panel-head panel-head-row"><div><h2>Retraits</h2><p id="withdrawalsCount">0 retrait</p></div><button id="openWithdrawalBtn2" class="text-action" type="button"><i class="fa-solid fa-plus"></i> Ajouter</button></div>
         <div id="withdrawalsList" class="entries-list"></div>
       </section>
+
+      <section class="panel section-gap">
+        <div class="panel-head panel-head-row"><div><h2>Caisse du centre</h2><p>Entrées et sorties indépendantes des médecins</p></div><button id="openCashBtn2" class="text-action" type="button"><i class="fa-solid fa-plus"></i> Ajouter</button></div>
+        <div class="cash-summary-grid">
+          <article class="cash-metric"><span>Entrées</span><strong><span id="cashIncome">0</span> <small>MRU</small></strong></article>
+          <article class="cash-metric"><span>Sorties</span><strong><span id="cashExpense">0</span> <small>MRU</small></strong></article>
+          <article class="cash-metric cash-balance"><span>Solde de caisse</span><strong><span id="cashBalance">0</span> <small>MRU</small></strong></article>
+        </div>
+        <div class="panel-head cash-history-head"><div><h2>Mouvements</h2><p id="cashCount">0 mouvement</p></div></div>
+        <div id="cashList" class="entries-list"></div>
+      </section>
     </main>
 
-    <footer class="app-footer"><span id="saveStatus">Enregistré localement</span><div><button id="exportBtn" class="footer-link"><i class="fa-solid fa-file-excel"></i> Exporter Excel</button><label class="footer-link">Importer<input id="importInput" type="file" accept="application/json" hidden /></label></div></footer>
+    <footer class="app-footer"><span id="saveStatus">Enregistré localement</span><div><button id="exportBtn" class="footer-link"><i class="fa-solid fa-file-excel"></i> Exporter Excel</button></div></footer>
   </div>
 
   <button id="fabEntryBtn" class="fab" type="button" aria-label="Nouvelle saisie"><i class="fa-solid fa-plus"></i></button>
@@ -65,7 +77,7 @@
         <label class="field"><span>Médecin de garde</span><select id="entryDoctor" required></select></label>
         <label class="field"><span>Consultations</span><input id="entryConsultations" type="number" min="0" step="1" inputmode="numeric" placeholder="0" required /></label>
         <label class="field"><span>Total généré (50 MRU / consultation)</span><div class="money-input"><input id="entryGenerated" type="number" readonly tabindex="-1" /><b>MRU</b></div></label>
-        <label class="field field-full"><span>Remarque</span><textarea id="entryNotes" rows="3" placeholder="Paiement, dépense, précision…"></textarea></label>
+        <label class="field field-full"><span>Remarque</span><textarea id="entryNotes" rows="3" placeholder="Paiement, précision…"></textarea></label>
       </div>
       <div class="modal-actions"><button id="cancelEntryBtn" class="secondary-btn" type="button">Annuler</button><button class="save-entry primary-btn" type="submit"><i class="fa-solid fa-check"></i><span>Enregistrer</span></button></div>
     </form>
@@ -81,6 +93,20 @@
         <label class="field field-full"><span>Remarque</span><textarea id="withdrawalNotes" rows="3" placeholder="Motif ou précision…"></textarea></label>
       </div>
       <div class="modal-actions"><button id="cancelWithdrawalBtn" class="secondary-btn" type="button">Annuler</button><button class="primary-btn" type="submit"><i class="fa-solid fa-check"></i><span>Enregistrer le retrait</span></button></div>
+    </form>
+  </dialog>
+
+  <dialog id="cashDialog" class="modal-dialog">
+    <form id="cashForm" class="modal-card">
+      <div class="modal-head"><div><p class="modal-kicker">Caisse du centre</p><h2 id="cashDialogTitle">Nouveau mouvement</h2></div><button id="closeCashBtn" class="close-button" type="button" aria-label="Fermer"><i class="fa-solid fa-xmark"></i></button></div>
+      <div class="form-grid">
+        <label class="field"><span>Date</span><input id="cashDate" type="date" required /></label>
+        <label class="field"><span>Type</span><select id="cashType" required><option value="income">Entrée</option><option value="expense">Sortie</option></select></label>
+        <label class="field field-full"><span>Montant</span><div class="money-input"><input id="cashAmount" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="0" required /><b>MRU</b></div></label>
+        <label class="field field-full"><span>Motif</span><input id="cashReason" type="text" maxlength="120" placeholder="Ex. achat de matériel, paiement reçu…" required /></label>
+        <label class="field field-full"><span>Remarque</span><textarea id="cashNotes" rows="3" placeholder="Précision facultative…"></textarea></label>
+      </div>
+      <div class="modal-actions"><button id="cancelCashBtn" class="secondary-btn" type="button">Annuler</button><button class="primary-btn" type="submit"><i class="fa-solid fa-check"></i><span>Enregistrer le mouvement</span></button></div>
     </form>
   </dialog>
 
