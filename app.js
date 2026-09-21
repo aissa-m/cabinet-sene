@@ -1,3 +1,4 @@
+const AUTH_USER='admin',AUTH_PASS='admin',AUTH_KEY='cabinet-sene-auth';
 const $=id=>document.getElementById(id),KEY='cabinet-sene-v4',PREV='cabinet-sene-v3',OLD='cabinet-sene-v2',PRICE=50;
 const defaults=['Mohamed','Ghadi','Khetri','Ahmedou','Mbay'];
 let editEntry=null,editWithdrawal=null,editCash=null,currentMonth=monthKey(new Date()),toastTimer,state=load();
@@ -84,12 +85,37 @@ function exportData(){
   a['!cols']=[{wch:13},{wch:24},{wch:15},{wch:23},{wch:20},{wch:42}];b['!cols']=[{wch:13},{wch:24},{wch:22},{wch:42}];c['!cols']=[{wch:13},{wch:12},{wch:30},{wch:18},{wch:42}];
   XLSX.utils.book_append_sheet(wb,a,'Saisies');XLSX.utils.book_append_sheet(wb,b,'Retraits');XLSX.utils.book_append_sheet(wb,c,'Caisse');XLSX.utils.book_append_sheet(wb,d,'Résumé');XLSX.writeFile(wb,`cabinet-sene-${new Date().toISOString().slice(0,10)}.xlsx`);toast('Excel exporté')
 }
+function login(){
+  const user=$('loginUser').value.trim(),pass=$('loginPassword').value;
+  if(user===AUTH_USER&&pass===AUTH_PASS){
+    sessionStorage.setItem(AUTH_KEY,'1');
+    $('loginError').textContent='';
+    showApp();
+  }else{
+    $('loginError').textContent='Utilisateur ou mot de passe incorrect.';
+  }
+}
+function showApp(){
+  $('loginScreen').hidden=true;
+  $('appRoot').hidden=false;
+}
+function showLogin(){
+  $('appRoot').hidden=true;
+  $('loginScreen').hidden=false;
+  $('loginForm').reset();
+  $('loginError').textContent='';
+  setTimeout(()=>$('loginUser').focus(),0);
+}
+function logout(){
+  sessionStorage.removeItem(AUTH_KEY);
+  showLogin();
+}
 function bind(){
-  $('entryConsultations').addEventListener('input',preview);$('openEntryBtn').addEventListener('click',openEntry);$('fabEntryBtn').addEventListener('click',openEntry);$('entryForm').addEventListener('submit',submitEntry);$('closeEntryBtn').addEventListener('click',closeEntry);$('cancelEntryBtn').addEventListener('click',closeEntry);
+  $('loginForm').addEventListener('submit',e=>{e.preventDefault();login()});$('logoutBtn').addEventListener('click',logout);  $('entryConsultations').addEventListener('input',preview);$('openEntryBtn').addEventListener('click',openEntry);$('fabEntryBtn').addEventListener('click',openEntry);$('entryForm').addEventListener('submit',submitEntry);$('closeEntryBtn').addEventListener('click',closeEntry);$('cancelEntryBtn').addEventListener('click',closeEntry);
   $('openWithdrawalBtn').addEventListener('click',openWithdrawal);$('openWithdrawalBtn2').addEventListener('click',openWithdrawal);$('withdrawalForm').addEventListener('submit',submitWithdrawal);$('closeWithdrawalBtn').addEventListener('click',closeWithdrawal);$('cancelWithdrawalBtn').addEventListener('click',closeWithdrawal);
   $('openCashBtn').addEventListener('click',openCash);$('openCashBtn2').addEventListener('click',openCash);$('cashForm').addEventListener('submit',submitCash);$('closeCashBtn').addEventListener('click',closeCash);$('cancelCashBtn').addEventListener('click',closeCash);
   $('entriesList').addEventListener('click',e=>{const a=e.target.closest('[data-ee]'),b=e.target.closest('[data-de]');if(a)editE(a.dataset.ee);if(b)deleteE(b.dataset.de)});$('withdrawalsList').addEventListener('click',e=>{const a=e.target.closest('[data-ew]'),b=e.target.closest('[data-dw]');if(a)editW(a.dataset.ew);if(b)deleteW(b.dataset.dw)});$('cashList').addEventListener('click',e=>{const a=e.target.closest('[data-ec]'),b=e.target.closest('[data-dc]');if(a)editC(a.dataset.ec);if(b)deleteC(b.dataset.dc)});
   $('prevMonthBtn').addEventListener('click',()=>changeMonth(-1));$('nextMonthBtn').addEventListener('click',()=>changeMonth(1));$('monthPicker').addEventListener('change',e=>{if(e.target.value){currentMonth=e.target.value;render()}});
   $('manageWorkersBtn').addEventListener('click',openWorkers);$('addDoctorQuickBtn').addEventListener('click',openWorkers);$('closeWorkersBtn').addEventListener('click',closeWorkers);$('addWorkerBtn').addEventListener('click',addWorker);$('newWorkerName').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addWorker()}});$('workersList').addEventListener('click',e=>{const b=e.target.closest('[data-rm]');if(b)removeWorker(b.dataset.rm)});$('workersList').addEventListener('change',e=>{if(e.target.dataset.rn)renameWorker(e.target.dataset.rn,e.target.value)});$('exportBtn').addEventListener('click',exportData)
 }
-bind();resetEntry();resetWithdrawal();resetCash();render();save();
+bind();resetEntry();resetWithdrawal();resetCash();render();save();if(sessionStorage.getItem(AUTH_KEY)==='1')showApp();else showLogin();
