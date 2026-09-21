@@ -9,10 +9,23 @@
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <div class="app-shell">
+  <section id="loginScreen" class="login-screen">
+    <form id="loginForm" class="login-card">
+      <div class="login-icon"><i class="fa-solid fa-lock"></i></div>
+      <p class="brand-kicker">Cabinet Séné</p>
+      <h1>Connexion</h1>
+      <p class="login-subtitle">Accès réservé à l’administration</p>
+      <label class="field"><span>Utilisateur</span><input id="loginUser" type="text" autocomplete="username" required /></label>
+      <label class="field"><span>Mot de passe</span><input id="loginPassword" type="password" autocomplete="current-password" required /></label>
+      <p id="loginError" class="login-error" role="alert"></p>
+      <button class="primary-btn login-btn" type="submit"><i class="fa-solid fa-right-to-bracket"></i><span>Se connecter</span></button>
+    </form>
+  </section>
+
+  <div id="appRoot" class="app-shell" hidden>
     <header class="app-header">
       <div><p class="brand-kicker">Cabinet Séné</p><h1>Suivi d’activité</h1><p class="subtitle">Consultations, retraits et caisse du centre</p></div>
-      <button id="manageWorkersBtn" class="icon-button" type="button" aria-label="Gérer les médecins" title="Gérer les médecins"><i class="fa-solid fa-user-doctor"></i></button>
+      <div class="header-actions"><button id="logoutBtn" class="icon-button" type="button" aria-label="Se déconnecter" title="Se déconnecter"><i class="fa-solid fa-right-from-bracket"></i></button><button id="manageWorkersBtn" class="icon-button" type="button" aria-label="Gérer les médecins" title="Gérer les médecins"><i class="fa-solid fa-user-doctor"></i></button></div>
     </header>
 
     <main>
